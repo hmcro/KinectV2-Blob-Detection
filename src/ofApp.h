@@ -25,31 +25,34 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
-    ofxPanel panel;
-    
     vector < shared_ptr<ofxKinectV2> > kinects;
     
     vector <ofTexture> texDepth;
     vector <ofTexture> texRGB;
-        
+
+    bool                    kinected = false; // boolean to prevent crashing when drawing empty graphics objects
+    
     ofxCvGrayscaleImage 	grayImage;
-    ofxCvGrayscaleImage 	grayBg;
+    ofxCvGrayscaleImage     grayBg;
     ofxCvGrayscaleImage 	grayDiff;
     
-    ofxCvContourFinder 	contourFinder;
+    ofxCvContourFinder      contourFinder;
     
-    int 				threshold;
+    ofxPanel                panel;
+    ofParameterGroup        parameters;
+    ofParameter<int>        threshold;
+    ofParameter<int>        minRectSize, maxRectSize; // this is the AREA of a rectangle, i.e. number of pixels
+
     
-    bool                bLearnBackground;
+    bool                    bLearnBackground;
     
-    ofPixels pixels;
+    
+    ofPixels                pixels;
     
     // image layout variables
-    
-    int pad;
-    int margin;
-    
-    int lh, lw, sh, sw;
+    int                     pad;
+    int                     margin;
+    int                     lh, lw, sh, sw;
     
     
 };

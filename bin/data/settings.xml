@@ -1,0 +1,10 @@
+<group>
+	<kinectV2_243728235247>
+		<minDistance>2448.98</minDistance>
+		<maxDistance>3673.47</maxDistance>
+	</kinectV2_243728235247>
+<group/>
+<Threshold>160</Threshold>
+	<Minimum_Blob_Size>20</Minimum_Blob_Size>
+	<Maximum_Blob_Size>100</Maximum_Blob_Size>
+</group>

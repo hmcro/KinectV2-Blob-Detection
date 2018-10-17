@@ -56,13 +56,15 @@ void ofApp::setup(){
     // #P create all the parameters that we will need:
     
     parameters.add(threshold.set("Threshold",0,0,255));    // #P threshold for determining solid vs empty space
-    parameters.add(minRectSize.set("Minimum Blob Size",0,0,100)); // #P Min size for a rectangle around a blob
-    parameters.add(maxRectSize.set("Maximum Blob Size",0,0,5000)); // #P Max size for a rectangle around a blob
+    parameters.add(minRectSize.set("Minimum Blob Size",0,0,1000)); // #P Min size for a rectangle around a blob
+    parameters.add(maxRectSize.set("Maximum Blob Size",0,0,320*240/3)); // #P Max size for a rectangle around a blob
+    parameters.add(rgbDisplay.set("Display RGB output",2));
     
     // #P Then add them to actual visible panel
     panel.add(threshold);
     panel.add(minRectSize);
     panel.add(maxRectSize);
+    panel.add(rgbDisplay);
     
     // #P Once parameters are initiated, load the values from out settings.xml file
     panel.loadFromFile("settings.xml");
@@ -86,7 +88,7 @@ void ofApp::update(){
                 texDepth[d].loadData( kinects[d]->getDepthPixels() );
                 
                 // #P gets rgb data, probably do not need this, or possible limit to 1fps to reduce cpu usage
-                texRGB[d].loadData( kinects[d]->getRgbPixels() );
+                if(rgbDisplay)texRGB[d].loadData( kinects[d]->getRgbPixels() );
                 
                 // #P load depth data to of pixel array
                 texDepth[d].readToPixels(pixels);
@@ -112,11 +114,10 @@ void ofApp::update(){
                 grayDiff.threshold(threshold);
                 
                 
-                
                 // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
                 // also, find holes is set to true so we will get interior contours as well....
                 // #P Minimum and maximum sizes to be modified to be live controlled and stored by ofxPanel
-                contourFinder.findContours(grayDiff, minRectSize, maxRectSize, 10, true);	// find holes
+                contourFinder.findContours(grayDiff, minRectSize, maxRectSize, 10, true, true);	// find holes
             }
         }
     }
@@ -130,68 +131,94 @@ void ofApp::draw(){
     
     //ofDrawBitmapString("ofxKinectV2: Work in progress addon.\nBased on the excellent work by the OpenKinect libfreenect2 team\n\n-Requires USB 3.0 port ( superspeed )\n-Requires patched libusb. If you have the libusb from ofxKinect ( v1 ) linked to your project it will prevent superspeed on Kinect V2", 5, 5);
     
-    
-    
-    //    lh = texDepth[0].getHeight();
-    //    lw = texDepth[0].getWidth();
-    //    sh = grayBg.getHeight();
-    //    sw = grayBg.getWidth();
+    grayDiffX = sw*2+pad*2+margin;
+    grayDiffY = lh+pad+margin;
     
     if (kinected){
         // #P draw all images on screen for  reference
         ofSetHexColor(0xffffff);
-        texDepth[0].draw(margin,margin);
-        grayImage.draw(lw+pad,margin);
-        grayBg.draw(margin,lh+pad+margin);
-        grayDiff.draw(sw+margin+pad,lh+pad+margin);
-    }
-    //grey rectangle to put blobs in
-    ofFill();
-    ofSetHexColor(0x333333);
-    ofDrawRectangle(sw*2+pad*2+margin,lh+pad+margin,320,240);
-    ofSetHexColor(0xffffff);
-    
-    // we could draw the whole contour finder
-    //contourFinder.draw(730,500);
-    
-    // or, instead we can draw each blob individually from the blobs vector,
-    // this is how to get access to them:
-    for (int i = 0; i < contourFinder.nBlobs; i++){
-        contourFinder.blobs[i].draw(sw*2+pad*2+margin,lh+pad+margin);
+        if(rgbDisplay)texRGB[0].draw(margin,margin,320,240);
+        //    texDepth[0].draw(margin,margin);
+        //    grayImage.draw(lw+pad,margin);
+        //    grayBg.draw(margin,lh+pad+margin);
+        //    grayDiff.draw(grayDiffX,grayDiffY);
         
-        // draw over the centroid if the blob is a hole
-        ofSetColor(255);
-        if(contourFinder.blobs[i].hole){
-            ofDrawBitmapString("hole",
-                               contourFinder.blobs[i].boundingRect.getCenter().x + 360,
-                               contourFinder.blobs[i].boundingRect.getCenter().y + 540);
+        
+        
+        // or, instead we can draw each blob individually from the blobs vector,
+        // this is how to get access to them:
+        ofSetHexColor(0xffffff);
+        ofPushMatrix();
+        ofTranslate(grayDiffX, grayDiffY);
+        //ofScale(0.9,0.5);
+        
+        //grey rectangle to put blobs in
+        ofFill();
+        ofSetHexColor(0x333333);
+        ofDrawRectangle(0,0,320,240);
+        ofSetHexColor(0xffffff);
+        
+        //Draw Polygon within which we'll be checking if the rectangles fall
+        drawPolygon();
+        
+        
+        for (int i = 0; i < contourFinder.nBlobs; i++){
+            contourFinder.blobs[i].draw();
+            if (detectionArea.inside(contourFinder.blobs[i].boundingRect.getCenter().x, contourFinder.blobs[i].boundingRect.getCenter().y)) {
+                ofNoFill();
+                ofSetColor(0,255,255);
+                ofDrawRectangle(contourFinder.blobs[i].boundingRect.x, contourFinder.blobs[i].boundingRect.y, contourFinder.blobs[i].boundingRect.width, contourFinder.blobs[i].boundingRect.height);
+            }
+            else{
+                ofNoFill();
+                ofSetColor(100,100,0);
+                ofDrawRectangle(contourFinder.blobs[i].boundingRect.x, contourFinder.blobs[i].boundingRect.y, contourFinder.blobs[i].boundingRect.width, contourFinder.blobs[i].boundingRect.height);
+            }
+            
+            // draw over the centroid if the blob is a hole
+            ofSetHexColor(0xffffff);
+            if(contourFinder.blobs[i].hole){
+                ofDrawBitmapString("hole",
+                                   contourFinder.blobs[i].boundingRect.getCenter().x,
+                                   contourFinder.blobs[i].boundingRect.getCenter().y);
+            }
         }
+        ofPopMatrix();
+        
+        //    if (contourFinder.nBlobs > 0) {
+        //        ofPoint point = contourFinder.blobs[0].boundingRect.getCenter();
+        //        cout << "ofPpoint point x=" << point.x << ", y=" << point.y << "\n";
+        //    }
+        
+        // finally, a report:
+        ofSetHexColor(0xffffff);
+        stringstream reportStr;
+        reportStr << "bg subtraction and blob detection" << endl
+        << "press ' ' to capture bg" << endl
+        << "threshold " << threshold << " (press: +/-)" << endl
+        << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
+        ofDrawBitmapString(reportStr.str(), 20, 600);
+        
+        
+        panel.draw();
+        
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::drawPolygon(){
     
-    // finally, a report:
+    verts[0] = ofPoint(30,30);
+    verts[1] = ofPoint(290,30);
+    verts[2] = ofPoint(290,210);
+    verts[3] = ofPoint(30,210);
+    
+    detectionArea.addVertices(verts, 4);
+    detectionArea.close(); // close the shape
+    ofFill();
+    ofSetHexColor(0xff0000);
+    detectionArea.draw();
     ofSetHexColor(0xffffff);
-    stringstream reportStr;
-    reportStr << "bg subtraction and blob detection" << endl
-    << "press ' ' to capture bg" << endl
-    << "threshold " << threshold << " (press: +/-)" << endl
-    << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
-    ofDrawBitmapString(reportStr.str(), 20, 600);
-    
-    
-    
-    
-    //    for(int d = 0; d < kinects.size(); d++){
-    //        float dwHD = 1920/4;
-    //        float dhHD = 1080/4;
-    //
-    //        float shiftY = 100 + ((10 + texDepth[d].getHeight()) * d);
-    //
-    //                texDepth[d].draw(200, shiftY);
-    //                texRGB[d].draw(210 + texDepth[d].getWidth(), shiftY, dwHD, dhHD);
-    //    }
-    
-    panel.draw();
-    
 }
 
 //--------------------------------------------------------------
@@ -251,7 +278,9 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    //This saves all our parameters whenever we have changed them with the mouse
+    cout << "mouseReleased outside panel!\n";
+    // #P This should save all our parameters whenever we have changed them with the mouse
+    // But mouse releases aren't recorded here when they are within the panel!
     panel.saveToFile("settings.xml");
     cout << "Saved to file";
 }

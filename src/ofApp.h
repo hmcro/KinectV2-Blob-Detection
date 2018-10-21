@@ -4,6 +4,7 @@
 #include "ofxKinectV2.h"
 #include "ofxGui.h"
 #include "ofxOpenCv.h"
+#include "ofPolyline.h"
 
 
 class ofApp : public ofBaseApp{
@@ -29,7 +30,7 @@ public:
     
     vector <ofTexture> texDepth;
     vector <ofTexture> texRGB;
-
+    
     bool                    kinected = false; // boolean to prevent crashing when drawing empty graphics objects
     
     ofxCvGrayscaleImage 	grayImage;
@@ -42,10 +43,22 @@ public:
     ofParameterGroup        parameters;
     ofParameter<int>        threshold;
     ofParameter<int>        minRectSize, maxRectSize; // this is the AREA of a rectangle, i.e. number of pixels
-
+    ofParameter<bool>       rgbDisplay;
+    ofParameter<bool>       depthDisplay;
+    ofParameter<bool>       thresholdDisplay;
+    ofParameter<float>      scaleX;
+    ofxVec2Slider           p1,p2,p3,p4;
     
     bool                    bLearnBackground;
     
+    void                    drawPolygon();
+    
+    ofPolyline              detectionArea;
+    ofPoint* verts = new ofPoint[4];
+    
+    int                     midScreenX, midScreenY; // coordinates of screen to draw blob rects in
+    int                     rgbSize;
+    float                   tmpX,tmpY;
     
     ofPixels                pixels;
     
@@ -54,5 +67,6 @@ public:
     int                     margin;
     int                     lh, lw, sh, sw;
     
+    int                     people;
     
 };

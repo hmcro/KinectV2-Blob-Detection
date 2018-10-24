@@ -17,4 +17,5 @@
 	<Display_Depth_Output>1</Display_Depth_Output>
 	<Display_Threshold_Output>1</Display_Threshold_Output>
 	<ScaleX>2</ScaleX>
+<Frame_Rate>5</Frame_Rate>
 </group>

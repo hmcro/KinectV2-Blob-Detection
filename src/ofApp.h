@@ -48,6 +48,7 @@ public:
     ofParameter<bool>       thresholdDisplay;
     ofParameter<float>      scaleX;
     ofxVec2Slider           p1,p2,p3,p4;
+    ofParameter<int>        frameRate;
     
     bool                    bLearnBackground;
     

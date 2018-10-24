@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    
     //Uncomment for verbose info from libfreenect2
     //ofSetLogLevel(OF_LOG_VERBOSE);
     
@@ -61,6 +62,7 @@ void ofApp::setup(){
     parameters.add(depthDisplay.set("Display Depth Output",2));
     parameters.add(thresholdDisplay.set("Display Threshold Output",2));
     parameters.add(scaleX.set("ScaleX",2,0,4));
+    parameters.add(frameRate.set("Frame Rate",30,1,60));
     
     // #P Then add them to actual visible panel
     panel.add(threshold);
@@ -70,7 +72,7 @@ void ofApp::setup(){
     panel.add(depthDisplay);
     panel.add(thresholdDisplay);
     panel.add(scaleX);
-    
+    panel.add(frameRate);
     
     panel.add(p1.setup("Upper Left Point",  ofVec2f(40, 30),           ofVec2f(0, 0), ofVec2f(80, 60)));
     panel.add(p2.setup("Upper Right Point", ofVec2f(320-40, 30),       ofVec2f(320-80, 0), ofVec2f(320, 60)));
@@ -96,6 +98,8 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    ofSetFrameRate(frameRate);
     
     if (kinected) {
         // #P cycling through kinect vector to be removed

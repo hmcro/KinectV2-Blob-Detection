@@ -1,21 +1,29 @@
 <group>
 	<kinectV2_243728235247>
 		<minDistance>405.612</minDistance>
-		<maxDistance>7216.84</maxDistance>
+		<maxDistance>2280.61</maxDistance>
 	</kinectV2_243728235247>
 <group/>
-<Threshold>141</Threshold>
-	<Minimum_Blob_Size>106</Minimum_Blob_Size>
-	<Maximum_Blob_Size>5760</Maximum_Blob_Size>
+<Threshold>15</Threshold>
+	<Minimum_Blob_Size>625</Minimum_Blob_Size>
+	<Maximum_Blob_Size>20080</Maximum_Blob_Size>
 <Display_RGB_output>1</Display_RGB_output>
 <Top_Left_Point>24.3878, 30.5357</Top_Left_Point>
 <Upper_Left_Point>0, 0</Upper_Left_Point>
 	<Upper_Right_Point>320, 0</Upper_Right_Point>
 	<Lower_Right_Point>320, 240</Lower_Right_Point>
 	<Lower_Left_Point>0, 240</Lower_Left_Point>
-<Display_RGB_Output>1</Display_RGB_Output>
-	<Display_Depth_Output>1</Display_Depth_Output>
-	<Display_Threshold_Output>1</Display_Threshold_Output>
+<Display_RGB_Output>0</Display_RGB_Output>
+	<Display_Depth_Output>0</Display_Depth_Output>
+	<Display_Threshold_Output>0</Display_Threshold_Output>
 	<ScaleX>2</ScaleX>
-<Frame_Rate>5</Frame_Rate>
+<Frame_Rate>30</Frame_Rate>
+<People_Averager__s_>3.35938</People_Averager__s_>
+<Quiet_Mode>0</Quiet_Mode>
+<Calibrate_Background>0</Calibrate_Background>
+<kinectV2_034568233647>
+		<minDistance>500</minDistance>
+		<maxDistance>2854.59</maxDistance>
+	</kinectV2_034568233647>
+	<Kinect_Update_Rate>1</Kinect_Update_Rate>
 </group>
